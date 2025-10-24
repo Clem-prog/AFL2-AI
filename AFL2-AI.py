@@ -12,4 +12,19 @@ graph = {
     'Africa': {'Korea': 180, 'Italy': 140, 'Atlantis': 170}
 }
 
+#Coordinates for heuristic
+positions = {
+    'Indonesia': (0, 3),
+    'Singapore': (1, 1),
+    'Spain': (2, 0),
+    'America': (2, 2),
+    'German': (2, 4),
+    'Italy': (4, 3),
+    'Brazil': (4, 5),
+    'Korea': (6, 4),
+    'Africa': (6, 2),
+    'Atlantis': (5, 1),
+    'Japan': (4, 0)
+}
+
 nodes = list(graph.keys())
