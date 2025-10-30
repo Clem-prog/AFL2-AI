@@ -47,6 +47,7 @@ def astar(graph, start, goal, heuristic):
     open_set = []
     heapq.heappush(open_set, (0, start))  # (f_cost, node)
     came_from = {}
+    nodes_explored = 0
 
     g_cost = {node: math.inf for node in graph}
     g_cost[start] = 0
@@ -56,6 +57,7 @@ def astar(graph, start, goal, heuristic):
 
     while open_set:
         current_f, current_node = heapq.heappop(open_set)
+        nodes_explored += 1
 
         if current_f > f_cost[current_node]:
             continue
@@ -67,7 +69,7 @@ def astar(graph, start, goal, heuristic):
                 path.append(current_node)
                 current_node = came_from[current_node]
             path.append(start)
-            return path[::-1], g_cost[goal]
+            return path[::-1], g_cost[goal], nodes_explored
 
         # Explore neighbors
         for neighbor, cost in graph[current_node].items():
@@ -78,7 +80,7 @@ def astar(graph, start, goal, heuristic):
                 f_cost[neighbor] = tentative_g + heuristic[neighbor]
                 heapq.heappush(open_set, (f_cost[neighbor], neighbor))
 
-    return None, math.inf
+    return None, math.inf, nodes_explored
 
 #BFS Seacrh Algorithm
 
@@ -87,10 +89,12 @@ def bfs(graph, start, goal):
     
     came_from = {}
     visited = {start}
+    nodes_explored = 0
     
     while queue:
         current_node = queue.popleft()
-
+        nodes_explored += 1
+    
         if current_node == goal:
             path = []
             total_cost = 0
@@ -102,7 +106,7 @@ def bfs(graph, start, goal):
                 total_cost += graph[parent_node][temp_node]
                 temp_node = parent_node
             path.append(start)
-            return path[::-1], total_cost
+            return path[::-1], total_cost, nodes_explored
 
         # Explore neighbors
         for neighbor, cost in graph[current_node].items():
@@ -112,7 +116,7 @@ def bfs(graph, start, goal):
                 came_from[neighbor] = current_node
                 queue.append(neighbor)
 
-    return None, math.inf
+    return None, math.inf, nodes_explored
 
 #GUI
 def run_comparison():
@@ -126,8 +130,8 @@ def run_comparison():
     heuristic = generate_heuristic(goal)
 
     #Run A* and BFS
-    a_path, a_cost = astar(graph, start, goal, heuristic)
-    b_path, b_cost = bfs(graph, start, goal)
+    a_path, a_cost, a_nodes = astar(graph, start, goal, heuristic)
+    b_path, b_cost, b_nodes = bfs(graph, start, goal)
 
     output_text.delete(1.0, tk.END)
 
@@ -136,7 +140,7 @@ def run_comparison():
         output_text.insert(tk.END, f"🌟 A* Search:\n")
         output_text.insert(tk.END, f"  Path: {' → '.join(a_path)}\n")
         output_text.insert(tk.END, f"  Cost: {a_cost}\n")
-        output_text.insert(tk.END, f"  Stops: {len(a_path) - 1}\n\n")
+        output_text.insert(tk.END, f"  Nodes Explored: {a_nodes}\n\n")
     else:
         output_text.insert(tk.END, "❌ A* could not find a path.\n\n")
 
@@ -144,7 +148,7 @@ def run_comparison():
         output_text.insert(tk.END, f"🔵 BFS Search:\n")
         output_text.insert(tk.END, f"  Path: {' → '.join(b_path)}\n")
         output_text.insert(tk.END, f"  Cost: {b_cost}\n")
-        output_text.insert(tk.END, f"  Stops: {len(b_path) - 1}\n\n")
+        output_text.insert(tk.END, f"  Nodes Explored: {b_nodes}\n\n")
     else:
         output_text.insert(tk.END, "❌ BFS could not find a path.\n\n")
 
@@ -213,28 +217,3 @@ result_label = tk.Label(root, text="", font=("Arial", 15, "bold"), bg="#F5F5F5",
 result_label.pack(pady=10)
 
 root.mainloop()
-
-# BAGIAN INI TERGANTUNG MAU DIPAKAI DI GUI ATAU NGGAK, KLO NGGAK HAPUS AJA YEAH :D, YANG PENTING OUTPUTNYA JANGAN DARI TERMINAL
-def main():
-    start = "Indonesia"
-    goal = "Atlantis"
-    heuristic = generate_heuristic("Atlantis")
-    path, cost = astar(graph, start, goal, heuristic)
-
-    if path:
-        print(f"\n🛫 Shortest path from {start} to {goal}: {' → '.join(path)}")
-        print(f"💰 Total travel cost: {cost}")
-    else:
-        print("No path found between these airports.")
-
-
-    print("--- Running BFS Search  ---")
-    bfs_path, bfs_cost = bfs(graph, start, goal) 
-
-    if bfs_path:
-        print(f"🛫 BFS Path from {start} to {goal}: {' → '.join(bfs_path)}")
-        print(f"💰 Total travel cost: {bfs_cost}")
-    else:
-        print("No path found between these airports.")
-
-main()
