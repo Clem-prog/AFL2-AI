@@ -217,28 +217,3 @@ result_label = tk.Label(root, text="", font=("Arial", 15, "bold"), bg="#F5F5F5",
 result_label.pack(pady=10)
 
 root.mainloop()
-
-# BAGIAN INI TERGANTUNG MAU DIPAKAI DI GUI ATAU NGGAK, KLO NGGAK HAPUS AJA YEAH :D, YANG PENTING OUTPUTNYA JANGAN DARI TERMINAL
-def main():
-    start = "Indonesia"
-    goal = "Atlantis"
-    heuristic = generate_heuristic("Atlantis")
-    path, cost = astar(graph, start, goal, heuristic)
-
-    if path:
-        print(f"\n🛫 Shortest path from {start} to {goal}: {' → '.join(path)}")
-        print(f"💰 Total travel cost: {cost}")
-    else:
-        print("No path found between these airports.")
-
-
-    print("--- Running BFS Search  ---")
-    bfs_path, bfs_cost = bfs(graph, start, goal) 
-
-    if bfs_path:
-        print(f"🛫 BFS Path from {start} to {goal}: {' → '.join(bfs_path)}")
-        print(f"💰 Total travel cost: {bfs_cost}")
-    else:
-        print("No path found between these airports.")
-
-main()
