@@ -1,6 +1,9 @@
 import math
 import heapq
 import collections
+import tkinter as tk
+from tkinter import ttk, messagebox
+
 
 graph = {
     'Indonesia': {'German': 200, 'America': 150, 'Singapore': 30},
@@ -110,6 +113,106 @@ def bfs(graph, start, goal):
                 queue.append(neighbor)
 
     return None, math.inf
+
+#GUI
+def run_comparison():
+    start = start_var.get()
+    goal = goal_var.get()
+
+    if start == goal:
+        messagebox.showwarning("Warning", "Start and goal cannot be the same!")
+        return
+
+    heuristic = generate_heuristic(goal)
+
+    #Run A* and BFS
+    a_path, a_cost = astar(graph, start, goal, heuristic)
+    b_path, b_cost = bfs(graph, start, goal)
+
+    output_text.delete(1.0, tk.END)
+
+    #Display & compare results
+    if a_path:
+        output_text.insert(tk.END, f"🌟 A* Search:\n")
+        output_text.insert(tk.END, f"  Path: {' → '.join(a_path)}\n")
+        output_text.insert(tk.END, f"  Cost: {a_cost}\n")
+        output_text.insert(tk.END, f"  Stops: {len(a_path) - 1}\n\n")
+    else:
+        output_text.insert(tk.END, "❌ A* could not find a path.\n\n")
+
+    if b_path:
+        output_text.insert(tk.END, f"🔵 BFS Search:\n")
+        output_text.insert(tk.END, f"  Path: {' → '.join(b_path)}\n")
+        output_text.insert(tk.END, f"  Cost: {b_cost}\n")
+        output_text.insert(tk.END, f"  Stops: {len(b_path) - 1}\n\n")
+    else:
+        output_text.insert(tk.END, "❌ BFS could not find a path.\n\n")
+
+    if a_path and b_path:
+        cheaper = "A*" if a_cost < b_cost else "BFS" if b_cost < a_cost else "Both are equal"
+        result_label.config(
+            text=f"🏆 Cheaper path: {cheaper} | A*: {a_cost} | BFS: {b_cost}",
+            fg="#008000" if cheaper != "Both are equal" else "#FF9800"
+        )
+    else:
+        result_label.config(text="❌ No valid comparison (one or both failed)", fg="#d32f2f")
+
+
+def clear_output():
+    output_text.delete(1.0, tk.END)
+    result_label.config(text="")
+    start_var.set("Indonesia")
+    goal_var.set("Atlantis")
+
+
+# Main Window
+root = tk.Tk()
+root.geometry("850x550")
+root.title("✈️ Plane Route Finder | Compare A* & BFS")
+root.configure(bg="#F5F5F5")
+root.minsize(850, 550)
+
+#Title
+title_label = tk.Label(root, text="🌍 Plane Route Finder (Compare A* & BFS)", font=("Arial", 22, "bold"), bg="#F5F5F5", fg="#333")
+title_label.pack(pady=10)
+
+#Dropdown
+frame = tk.Frame(root, bg="#F5F5F5")
+frame.pack(pady=10)
+
+tk.Label(frame, text="Start:", font=("Arial", 14), bg="#F5F5F5").grid(row=0, column=0, padx=10)
+tk.Label(frame, text="Goal:", font=("Arial", 14), bg="#F5F5F5").grid(row=0, column=2, padx=10)
+
+start_var = tk.StringVar(value="Indonesia")
+goal_var = tk.StringVar(value="Atlantis")
+airport_list = list(graph.keys())
+
+start_menu = ttk.Combobox(frame, textvariable=start_var, values=airport_list, font=("Arial", 12), state="readonly", width=15)
+goal_menu = ttk.Combobox(frame, textvariable=goal_var, values=airport_list, font=("Arial", 12), state="readonly", width=15)
+start_menu.grid(row=0, column=1)
+goal_menu.grid(row=0, column=3)
+
+#Buttons
+btn_frame = tk.Frame(root, bg="#F5F5F5")
+btn_frame.pack(pady=15)
+
+compare_btn = tk.Button(btn_frame, text="Compare A* and BFS", font=("Arial", 14), bg="#673AB7", fg="white", padx=20, command=run_comparison)
+clear_btn = tk.Button(btn_frame, text="Clear Output", font=("Arial", 14), bg="#f44336", fg="white", padx=20, command=clear_output)
+
+compare_btn.grid(row=0, column=0, padx=10)
+clear_btn.grid(row=0, column=1, padx=10)
+
+#Output
+output_frame = tk.Frame(root)
+output_frame.pack(padx=20, pady=10, fill=tk.BOTH, expand=True)
+
+output_text = tk.Text(output_frame, height=12, font=("Arial", 14), wrap="word")
+output_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+result_label = tk.Label(root, text="", font=("Arial", 15, "bold"), bg="#F5F5F5", fg="#222")
+result_label.pack(pady=10)
+
+root.mainloop()
 
 # BAGIAN INI TERGANTUNG MAU DIPAKAI DI GUI ATAU NGGAK, KLO NGGAK HAPUS AJA YEAH :D, YANG PENTING OUTPUTNYA JANGAN DARI TERMINAL
 def main():
